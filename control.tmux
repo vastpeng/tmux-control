@@ -71,6 +71,11 @@ navigation_binding() {
     tmux bind-key -n F10 kill-pane
     # kill the window
     tmux bind-key -n F11 confirm kill-window
+
+    tmux unbind n
+	tmux unbind p
+	tmux bind -r C-h previous-window # select previous window
+	tmux bind -r C-l next-window     # select next window
 }
 
 main() {
