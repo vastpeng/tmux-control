@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+default_pane_resize="5"
+
+get_tmux_option() {
+	local option=$1
+	local default_value=$2
+	local option_value=$(tmux show-option -gqv "$option")
+	if [ -z $option_value ]; then
+		echo $default_value
+	else
+		echo $option_value
+	fi
+}
+
+pane_navigation_bindings() {
+	tmux bind-key h   select-pane -L
+	tmux bind-key C-h select-pane -L
+	tmux bind-key j   select-pane -D
+	tmux bind-key C-j select-pane -D
+	tmux bind-key k   select-pane -U
+	tmux bind-key C-k select-pane -U
+	tmux bind-key l   select-pane -R
+	tmux bind-key C-l select-pane -R
+}
+
+window_move_bindings() {
+	tmux bind-key -r "<" swap-window -t -1
+	tmux bind-key -r ">" swap-window -t +1
+}
+
+pane_resizing_bindings() {
+	local pane_resize=$(get_tmux_option "@pane_resize" "$default_pane_resize")
+	tmux bind-key -r H resize-pane -L "$pane_resize"
+	tmux bind-key -r J resize-pane -D "$pane_resize"
+	tmux bind-key -r K resize-pane -U "$pane_resize"
+	tmux bind-key -r L resize-pane -R "$pane_resize"
+}
+
+pane_split_bindings() {
+	tmux bind-key "|" split-window -h -c "#{pane_current_path}"
+	tmux bind-key "\\" split-window -fh -c "#{pane_current_path}"
+	tmux bind-key "-" split-window -v -c "#{pane_current_path}"
+	tmux bind-key "_" split-window -fv -c "#{pane_current_path}"
+	tmux bind-key "%" split-window -h -c "#{pane_current_path}"
+	tmux bind-key '"' split-window -v -c "#{pane_current_path}"
+}
+
+improve_new_window_binding() {
+	tmux bind-key "c" new-window -c "#{pane_current_path}"
+}
+
+prefix_binding() {
+    unbind C-b
+    set -g prefix C-a
+    bind C-a send-prefix
+}
+
+edit_and_load_configuration_binding() {
+    # edit configuration
+    bind e new-window -n '~/.tmux.conf.local' "sh -c '\${EDITOR:-vim} ~/.tmux.conf.local && tmux source ~/.tmux.conf && tmux display \"~/.tmux.conf sourced\"'"
+
+    # reload configuration
+    bind r source-file ~/.tmux.conf \; display '~/.tmux.conf sourced'
+}
+
+
+navigation_binding() {
+    # find session
+    bind C-f command-prompt -p find-session 'switch-client -t %%'
+
+    # kill the session
+    bind -n F12 confirm kill-session
+}
+
+main() {
+    prefix_binding
+	pane_navigation_bindings
+	window_move_bindings
+	pane_resizing_bindings
+	pane_split_bindings
+	improve_new_window_binding
+}
+main
