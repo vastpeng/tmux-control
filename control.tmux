@@ -51,30 +51,32 @@ improve_new_window_binding() {
 }
 
 prefix_binding() {
-    unbind C-b
-    set -g prefix C-a
-    bind C-a send-prefix
+    tmux unbind-key C-b
+    tmux set -g prefix C-a
+    tmux bind-key C-a send-prefix
 }
 
 edit_and_load_configuration_binding() {
     # edit configuration
-    bind e new-window -n '~/.tmux.conf.local' "sh -c '\${EDITOR:-vim} ~/.tmux.conf.local && tmux source ~/.tmux.conf && tmux display \"~/.tmux.conf sourced\"'"
+    tmux bind-key e new-window -n '~/.tmux.conf.local' "sh -c '\${EDITOR:-vim} ~/.tmux.conf.local && tmux source ~/.tmux.conf && tmux display \"~/.tmux.conf sourced\"'"
 
     # reload configuration
-    bind r source-file ~/.tmux.conf \; display '~/.tmux.conf sourced'
+    tmux bind-key r source-file ~/.tmux.conf \; display '~/.tmux.conf sourced'
 }
 
 
 navigation_binding() {
     # find session
-    bind C-f command-prompt -p find-session 'switch-client -t %%'
+    tmux bind-key C-f command-prompt -p find-session 'switch-client -t %%'
 
     # kill the session
-    bind -n F12 confirm kill-session
+    tmux bind-key -n F12 confirm kill-session
 }
 
 main() {
     prefix_binding
+    edit_and_load_configuration_binding
+    navigation_binding
 	pane_navigation_bindings
 	window_move_bindings
 	pane_resizing_bindings
