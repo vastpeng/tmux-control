@@ -67,6 +67,10 @@ navigation_binding() {
 
     # kill the session
     tmux bind-key -n F12 confirm kill-session
+    # kill the pane
+    tmux bind-key -n F10 kill-pane
+    # kill the window
+    tmux bind-key -n F11 confirm kill-window
 }
 
 main() {
